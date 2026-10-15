@@ -1,0 +1,214 @@
+﻿```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityCare Hospital Appointment Portal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #243247;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #087f8c;
+            color: white;
+            text-align: center;
+            padding: 28px 15px;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+        }
+
+        nav {
+            background: #075e68;
+            text-align: center;
+            padding: 12px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 14px;
+            font-weight: bold;
+        }
+
+        .announcement {
+            background: #fff1c9;
+            color: #704b00;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 16px;
+        }
+
+        section {
+            background: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px #00000010;
+        }
+
+        h2 {
+            color: #087f8c;
+            margin-bottom: 15px;
+        }
+
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+        }
+
+        .doctor {
+            border: 1px solid #dce5ed;
+            border-radius: 8px;
+            padding: 18px;
+            border-top: 4px solid #087f8c;
+        }
+
+        .doctor h3 {
+            margin-bottom: 8px;
+        }
+
+        .specialization {
+            color: #087f8c;
+            font-weight: bold;
+        }
+
+        .slot {
+            display: inline-block;
+            background: #e1f5ec;
+            color: #12643d;
+            padding: 5px 9px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        ul {
+            padding-left: 22px;
+        }
+
+        .appointment-note {
+            background: #eaf4ff;
+            padding: 15px;
+            border-radius: 7px;
+        }
+
+        footer {
+            background: #075e68;
+            color: white;
+            text-align: center;
+            padding: 18px;
+        }
+
+        @media (max-width: 600px) {
+            nav a {
+                display: inline-block;
+                margin: 5px 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>CityCare Hospital</h1>
+        <p>Quality Healthcare, Compassionate Care</p>
+        <p>Online Hospital Appointment Portal</p>
+    </header>
+
+    <nav>
+        <a href="#doctors">Doctors</a>
+        <a href="#appointments">Appointments</a>
+        <a href="#announcements">Announcements</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="announcement">
+        Announcement: General health check-up appointments are now available.
+    </div>
+
+    <main>
+        <section id="doctors">
+            <h2>Our Doctors</h2>
+
+            <div class="doctor-grid">
+                <article class="doctor">
+                    <h3>Dr. Anitha Kumar</h3>
+                    <p class="specialization">Cardiology</p>
+                    <p>Consultation: Monday-Friday</p>
+                    <p>Timings: 9:00 AM - 12:00 PM</p>
+                    <span class="slot">Available Slots: 8</span>
+                </article>
+
+                <article class="doctor">
+                    <h3>Dr. Rahul Sharma</h3>
+                    <p class="specialization">Dermatology</p>
+                    <p>Consultation: Monday-Saturday</p>
+                    <p>Timings: 10:00 AM - 1:00 PM</p>
+                    <span class="slot">Available Slots: 6</span>
+                </article>
+
+                <article class="doctor">
+                    <h3>Dr. Priya Nair</h3>
+                    <p class="specialization">Pediatrics</p>
+                    <p>Consultation: Monday-Friday</p>
+                    <p>Timings: 2:00 PM - 5:00 PM</p>
+                    <span class="slot">Available Slots: 5</span>
+                </article>
+            </div>
+        </section>
+
+        <section id="appointments">
+            <h2>Appointment Information</h2>
+            <div class="appointment-note">
+                <p><strong>Step 1:</strong> Select a doctor and specialization.</p>
+                <p><strong>Step 2:</strong> Check the consultation timings and available slots.</p>
+                <p><strong>Step 3:</strong> Contact the hospital to confirm your appointment.</p>
+                <p>Note: This is a demonstration webpage; it does not book appointments.</p>
+            </div>
+        </section>
+
+        <section id="announcements">
+            <h2>Hospital Announcements</h2>
+            <ul>
+                <li>Free general health screening this Saturday.</li>
+                <li>New dermatology consultation slots are available.</li>
+                <li>Emergency services operate 24 hours a day.</li>
+            </ul>
+        </section>
+
+        <section id="contact">
+            <h2>Contact Information</h2>
+            <p>Hospital: CityCare Hospital</p>
+            <p>Address: Vellore, Tamil Nadu</p>
+            <p>Email: appointments@citycare.example</p>
+            <p>Phone: +91 98765 43210</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 CityCare Hospital | Online Appointment Portal</p>
+    </footer>
+</body>
+</html>
+```
