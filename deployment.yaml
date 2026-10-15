@@ -5,6 +5,7 @@ metadata:
   name: online-hospital-appointment-portal
 spec:
   replicas: 3
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: hospital-portal
