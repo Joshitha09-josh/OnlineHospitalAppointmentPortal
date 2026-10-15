@@ -4,9 +4,11 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'balaji00002/online-hospital-appointment-portal'
-        STABLE_TAG = 'v1'
+        RELEASE_TAG = "build-${BUILD_NUMBER}"
+
         DOCKER = 'C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe'
         KUBECTL = 'C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe'
+
         DEPLOYMENT_NAME = 'online-hospital-appointment-portal'
         SERVICE_NAME = 'hospital-portal-service'
     }
@@ -15,7 +17,7 @@ pipeline {
         choice(
             name: 'RELEASE_MODE',
             choices: ['STABLE', 'TEST_FAULTY_RELEASE'],
-            description: 'STABLE deploys v1. TEST_FAULTY_RELEASE tests automatic rollback.'
+            description: 'STABLE deploys a new image. TEST_FAULTY_RELEASE tests automatic rollback.'
         )
     }
 
@@ -28,17 +30,17 @@ pipeline {
 
         stage('2. Build Docker Image') {
             steps {
-                bat '"%DOCKER%" build -t %DOCKER_IMAGE%:%STABLE_TAG% .'
+                bat '"%DOCKER%" build -t %DOCKER_IMAGE%:%RELEASE_TAG% .'
             }
         }
 
         stage('3. Test Application Image') {
             steps {
-                bat '"%DOCKER%" image inspect %DOCKER_IMAGE%:%STABLE_TAG%'
+                bat '"%DOCKER%" image inspect %DOCKER_IMAGE%:%RELEASE_TAG%'
             }
         }
 
-        stage('4. Push Stable Image') {
+        stage('4. Push Image to Docker Hub') {
             when {
                 expression { params.RELEASE_MODE == 'STABLE' }
             }
@@ -54,8 +56,10 @@ pipeline {
                         @echo off
                         echo %DOCKER_PASSWORD% | "%DOCKER%" login -u "%DOCKER_USERNAME%" --password-stdin
                         if errorlevel 1 exit /b 1
-                        "%DOCKER%" push %DOCKER_IMAGE%:%STABLE_TAG%
+
+                        "%DOCKER%" push %DOCKER_IMAGE%:%RELEASE_TAG%
                         if errorlevel 1 exit /b 1
+
                         "%DOCKER%" logout
                     '''
                 }
@@ -68,8 +72,11 @@ pipeline {
                     @echo off
                     "%KUBECTL%" get deployment %DEPLOYMENT_NAME% -o yaml > previous-deployment.yaml
                     if errorlevel 1 exit /b 1
+
                     "%KUBECTL%" get deployment %DEPLOYMENT_NAME% -o jsonpath="{.spec.template.spec.containers[0].image}" > previous-image.txt
                     if errorlevel 1 exit /b 1
+
+                    echo Previously deployed image:
                     type previous-image.txt
                 '''
             }
@@ -79,14 +86,18 @@ pipeline {
             steps {
                 script {
                     if (params.RELEASE_MODE == 'TEST_FAULTY_RELEASE') {
+                        echo 'Testing a deliberately unavailable image tag.'
+
                         bat '''
-                            "%KUBECTL%" set image deployment/%DEPLOYMENT_NAME% hospital-portal=%DOCKER_IMAGE%:faulty
+                            "%KUBECTL%" set image deployment/%DEPLOYMENT_NAME% hospital-portal=%DOCKER_IMAGE%:faulty-do-not-exist
+                            if errorlevel 1 exit /b 1
                         '''
                     } else {
                         bat '''
                             "%KUBECTL%" apply -f deployment.yaml
                             if errorlevel 1 exit /b 1
-                            "%KUBECTL%" set image deployment/%DEPLOYMENT_NAME% hospital-portal=%DOCKER_IMAGE%:%STABLE_TAG%
+
+                            "%KUBECTL%" set image deployment/%DEPLOYMENT_NAME% hospital-portal=%DOCKER_IMAGE%:%RELEASE_TAG%
                             if errorlevel 1 exit /b 1
                         '''
                     }
@@ -94,7 +105,7 @@ pipeline {
             }
         }
 
-        stage('7. Verify Rollout and Roll Back on Failure') {
+        stage('7. Verify Rollout and Automatic Rollback') {
             steps {
                 script {
                     int rolloutResult = bat(
@@ -103,21 +114,24 @@ pipeline {
                     )
 
                     if (rolloutResult != 0) {
-                        echo 'Rollout failed. Restoring the previous stable Kubernetes revision.'
+                        echo 'ROLLOUT FAILED. Rolling back to the previous Kubernetes revision.'
+
                         bat '"%KUBECTL%" rollout undo deployment/%DEPLOYMENT_NAME%'
                         bat '"%KUBECTL%" rollout status deployment/%DEPLOYMENT_NAME% --timeout=120s'
+
+                        echo 'Rollback completed. The previous deployment is available again.'
                     } else {
-                        echo 'Deployment rollout completed successfully.'
+                        echo 'Rollout succeeded.'
                     }
                 }
             }
         }
 
-        stage('8. Verify Application') {
+        stage('8. Verify Deployment, Pods and Service') {
             steps {
-                bat '"%KUBECTL%" get deployments'
+                bat '"%KUBECTL%" get deployment %DEPLOYMENT_NAME%'
                 bat '"%KUBECTL%" get pods -l app=hospital-portal'
-                bat '"%KUBECTL%" get services'
+                bat '"%KUBECTL%" get service %SERVICE_NAME%'
                 bat '"%KUBECTL%" rollout history deployment/%DEPLOYMENT_NAME%'
             }
         }
@@ -125,10 +139,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed. Check rollout and Pod status in Console Output.'
+            echo 'Pipeline completed successfully. Check the rollout and Pod status.'
         }
         failure {
-            echo 'Pipeline failed. Inspect Console Output and Kubernetes rollout status.'
+            echo 'Pipeline failed. Check Console Output and Kubernetes rollout status.'
         }
     }
 }
